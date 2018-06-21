@@ -1,16 +1,86 @@
-<!-- <div class="expenses">
-  <form class="form">
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="Favorite food" value="Sushi">
+<div class="expenses">
+  <form class="form" #f (ngSubmit)="submit(f)">
+    <p>Dodawanie wydatku</p>
+    <div class="inputs-wrapper">
+    <mat-form-field>
+      <mat-select placeholder="Kategoria wydatku *" [(ngModel)]="activeCategoryIndex" name="category">
+        <mat-option *ngFor="let category of categories; let i = index" [value]="i">
+          {{ category.name }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="Favorite food" value="Sushi">
+
+    <mat-form-field *ngIf="activeCategoryIndex >= 0; else emptyInput">
+      <mat-select placeholder="Podkategoria" [(ngModel)]="subcategory" name="subcategory">
+        <mat-option *ngFor="let subcategory of categories[activeCategoryIndex].subcategory" value="{{subcategory}}">
+          {{ subcategory }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="Favorite food" value="Sushi">
+
+    <ng-template #emptyInput>
+      <mat-form-field>
+        <mat-select placeholder="Podkategoria">
+          <mat-option>
+            Najpierw wybierz kategorię
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-template>
+
+    <mat-form-field>
+      <input matInput placeholder="Wysokość wydatku *" type="number" name="value" [(ngModel)]="value">
     </mat-form-field>
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="Favorite food" value="Sushi">
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker" placeholder="Podaj datę wydatku *" [(ngModel)]="date" name="date">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
+
+    <button mat-button type="sumbit">Resetuj Formularz</button>
+    <button mat-button type="sumbit">Dodaj wydatek</button>
+  </div>
+  <p>* pola wymagane</p>
   </form>
-</div> -->
+
+  <div class="spinner-container" *ngIf="expenses.loading$ | async">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <table mat-table [dataSource]="expenses" class="mat-elevation-z8" *ngIf="expenses" class="table">
+    <ng-container matColumnDef="number">
+      <th mat-header-cell *matHeaderCellDef>l.p.</th>
+      <td mat-cell *matCellDef="let element; let i = index"> {{i}} </td>
+    </ng-container>
+
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef>Kategoria.</th>
+        <td mat-cell *matCellDef="let element"> {{element.category}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="subcategory">
+        <th mat-header-cell *matHeaderCellDef>Podkategoria.</th>
+        <td mat-cell *matCellDef="let element"> {{element.subcategory}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="value">
+        <th mat-header-cell *matHeaderCellDef>Wartość wydatku</th>
+        <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Data wydatku</th>
+        <td mat-cell *matCellDef="let element"> {{element.date | date: 'shortDate'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Akcja</th>
+        <td mat-cell *matCellDef="let element">  </td>
+      </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;"></tr>
+  </table>
+
+</div>
